@@ -41,6 +41,7 @@ li.notepad-infos textarea{
     border: 0;
     background: #fff;
     resize: none;
+    text-decoration: none;
 }
 
 li.notepad-infos span {

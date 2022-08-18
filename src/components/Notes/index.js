@@ -1,9 +1,35 @@
-import React from "react";
-import { BsTrash, BsExclamationCircle } from "react-icons/bs";
+import React, {useState} from "react";
+import { BsTrash, BsCheckCircle } from "react-icons/bs";
 import './style.css'
 import './style-priority.css'
+import api from "../../services/api";
 
-function Notes({data}) {
+function Notes({data, handleDelete, handleChangePriority}) {
+
+    const [ changedNote, setChangedNote] = useState('');   
+
+    async function handleSave(e, notes){
+        e.style.cursor = 'default';    
+        e.style.boxShadow = 'none';
+
+        if (changedNote && changedNote !== notes) {
+            await api.post(`/contents/${data._id}`, {
+                notes: changedNote,
+            });
+        } 
+    }
+
+    function handleEdit(e, priority){
+        e.style.cursor = 'text';
+        e.style.borderRadius = '5px';
+
+        if(priority) {
+            e.style.boxShadow = '0 0 5px white';
+        } else {
+            e.style.boxShadow = '0 0 5px gray';
+        }
+    }
+
     return (
         <>
 
@@ -11,13 +37,22 @@ function Notes({data}) {
                 <div>
                     <strong>{data.title.toUpperCase()}</strong>
                     <div>
-                        <BsTrash size="20"/>
+                        <BsTrash 
+                        size="20"
+                        onClick={() => handleDelete(data._id)}/>
                     </div>
                 </div>
-                <textarea defaultValue={data.notes}/> 
+                <textarea 
+                    defaultValue={data.notes}
+                    onClick={e => handleEdit(e.target, data.priority)}
+                    onChange={e => setChangedNote(e.target.value)}
+                    onBlur={e => handleSave(e.target, data.notes)}
+                /> 
 
                 <span>
-                    <BsExclamationCircle size="20"/>
+                    <BsCheckCircle 
+                    size="20"
+                    onClick={() => handleChangePriority(data._id)}/>
                 </span>
             </li>
 

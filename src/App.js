@@ -9,7 +9,7 @@ import './main.css'
 
 
 import Notes from "./components/Notes";
-import RadioButton from "./components/RadioButton";
+
 
 function App() {
 
@@ -32,23 +32,42 @@ function App() {
     setAllNotes([...allNotes, response.data])
 
   }
+
   useEffect(() => {
-    async function getAllNotes() {
-      const response = await api.get('/annotations',)
-
-      setAllNotes(response.data)
-    }
-
+    
     getAllNotes();
-
+    
   }, [])
+  
+  async function getAllNotes() {
+    const response = await api.get('/annotations',)
+
+    setAllNotes(response.data)
+  }
+
+  async function handleDelete(id) {
+    const deletedNote = await api.delete(`/annotations/${id}`);
+
+    if(deletedNote) {
+      setAllNotes(allNotes.filter(n => n._id !== id));
+    }
+  } 
+
+  async function handleChangePriority(id){
+    const note = await api.post(`/priorities/${id}`);
+
+    if (note) {
+      getAllNotes();
+    }
+  }
+
 
   useEffect(() => {
     function enableSubmitButton() {
       let btn = document.getElementById('btn_submit')
       btn.style.background = '#ffd3ca'
 
-      if(title && notes) {
+      if (title && notes) {
         btn.style.background = "#eb8f7a"
       }
     }
@@ -87,12 +106,15 @@ function App() {
 
         </form>
 
-        <RadioButton/>
+
       </aside>
       <main>
         <ul>
           {allNotes.map(data => (
-            <Notes data={data} />
+            <Notes 
+            data={data}
+            handleDelete={handleDelete} 
+            handleChangePriority={handleChangePriority}/>
           ))}
         </ul>
       </main>
